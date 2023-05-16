@@ -8,6 +8,8 @@ import com.liuzhuo.common.utils.RedisUtil;
 import com.liuzhuo.common.vo.LoginResult;
 import com.liuzhuo.common.vo.ResultVo;
 import com.liuzhuo.domain.SecurityUser;
+import com.liuzhuo.domain.User;
+import com.liuzhuo.service.UserService;
 import io.jsonwebtoken.Jwts;
 import jdk.nashorn.internal.ir.ReturnNode;
 import org.apache.ibatis.util.MapUtil;
@@ -33,6 +35,9 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
     @Resource
     private RedisUtil redisUtil;
 
+    @Resource
+    private UserService userService;
+
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         // 设置客户端的响应编码
@@ -52,8 +57,14 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
         data.put("token", token);
         data.put("expireTime", expireTime);
 
+        // 查询用户信息存储到redis中
+        User sysUser = userService.findByUsername(user.getUsername());
+
         // 存入redis
         redisUtil.set("token_" + token,token, jwtUtils.getExpiration() / 1000);
+
+        // 将用户信息存入redis
+        redisUtil.hmSet(PublicConstant.USER_INFO_KEY,user.getUsername(),sysUser);
 
         // 转成json字符串
         ObjectMapper mapper = new ObjectMapper();

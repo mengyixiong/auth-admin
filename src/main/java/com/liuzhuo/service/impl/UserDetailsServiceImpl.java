@@ -18,6 +18,7 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Component
@@ -44,9 +45,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         // 获取用户的权限
         List<Permission> permissionList = permissionService.findPermissionListByUserId(user.getId());
 
+        // 设置用户权限
+        userDetail.setPermissions(permissionList);
+
         // 过滤掉code为null的权限，并且将code转换为字符串数组
-        List<String> permissionStrings = permissionList.stream().map(Permission::getCode).filter(code -> code != null).collect(Collectors.toList());
-        String[] strings = permissionStrings.toArray(new String[permissionStrings.size()]);
+        String[] strings = permissionList.stream().map(Permission::getCode).filter(Objects::nonNull).toArray(String[]::new);
 
         // 生成权限列表
         List<GrantedAuthority> authorityList = AuthorityUtils.createAuthorityList(strings);

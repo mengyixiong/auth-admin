@@ -47,8 +47,10 @@ public class CheckTokenFilter extends OncePerRequestFilter {
         // 获取当前的请求URI
         String requestURI = request.getRequestURI();
 
-        // 如果不是登录请求，需要验证token
-        if (!requestURI.equals(this.loginUrl)) {
+        String token = request.getHeader(PublicConstant.TOKEN_HEADER);
+
+        // 如果有token就需要验证token
+        if (!ObjectUtils.isEmpty(token)) {
             try {
                 this.validateToken(request);
                 filterChain.doFilter(request, response);
@@ -58,8 +60,6 @@ public class CheckTokenFilter extends OncePerRequestFilter {
         } else {
             filterChain.doFilter(request, response);
         }
-
-
 
     }
 

@@ -22,6 +22,14 @@ public class ResultVo<T> {
         return resultVo;
     }
 
+    public static <T> ResultVo<T> success(T data) {
+        ResultVo<T> resultVo = new ResultVo<>();
+        resultVo.setCode(200);
+        resultVo.setMsg("操作成功");
+        resultVo.setData(data);
+        return resultVo;
+    }
+
     public static <T> ResultVo<T> success(String msg) {
         ResultVo<T> resultVo = new ResultVo<>();
         resultVo.setCode(200);

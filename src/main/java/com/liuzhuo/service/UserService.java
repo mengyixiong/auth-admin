@@ -1,9 +1,11 @@
 package com.liuzhuo.service;
 
+import com.liuzhuo.common.vo.UserInfoVo;
 import com.liuzhuo.domain.User;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Administrator
@@ -24,4 +26,15 @@ public interface UserService extends IService<User> {
      * @return
      */
     HashMap<String,Object> refreshToken(String token);
+
+
+    /**
+     * 获取用户信息
+     */
+    UserInfoVo getInfo();
+
+    /**
+     * 登录
+     */
+    Map<String, Object> login(String username, String password);
 }

@@ -5,6 +5,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.List;
 
 @Data
 public class SecurityUser implements UserDetails {
@@ -15,6 +16,8 @@ public class SecurityUser implements UserDetails {
     private boolean isCredentialsNonExpired = true;
     private boolean isEnabled = true;
     Collection<? extends GrantedAuthority> authorities;
+
+    List<Permission> permissions;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

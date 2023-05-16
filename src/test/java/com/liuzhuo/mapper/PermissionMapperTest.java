@@ -20,4 +20,5 @@ public class PermissionMapperTest {
         List<String> permissionStrings = permissionList.stream().filter(item-> item.getCode() != null).map(Permission::getCode).collect(Collectors.toList());
         permissionStrings.forEach(System.out::println);
     }
+
 }

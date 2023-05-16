@@ -5,8 +5,10 @@ import com.liuzhuo.service.impl.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -65,20 +67,33 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private String loginProcessingUrl;
 
     @Override
+    public void configure(WebSecurity web) throws Exception {
+        web.ignoring().antMatchers(
+                "/api/user/login",
+                "/api/user/logout",
+                "favicon.ico",
+                "/doc.html",
+                "/webjars/**",
+                "/swagger-resources/**",
+                "/v2/api-docs/**"
+        );
+    }
+
+
+    @Override
     protected void configure(HttpSecurity http) throws Exception {
-        // 开启token验证
-        http.addFilterBefore(checkTokenFilter, UsernamePasswordAuthenticationFilter.class);
+
         //登录前进行过滤
         http.formLogin()
-                .loginProcessingUrl(this.loginProcessingUrl)
-                // 设置登录验证成功或失败后的的跳转地址
-                .successHandler(loginSuccessHandler).failureHandler(loginFailureHandler)
+//                .loginProcessingUrl(this.loginProcessingUrl)
+//                // 设置登录验证成功或失败后的的跳转地址
+//                .successHandler(loginSuccessHandler)
+                .failureHandler(loginFailureHandler)
                 // 禁用csrf防御机制
                 .and().csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers("/api/user/login").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .exceptionHandling()
@@ -86,7 +101,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .accessDeniedHandler(customerAccessDeniedHandler)
                 .and().cors();//开启跨域配置
 
-
+        // 开启token验证
+        http.addFilterBefore(checkTokenFilter, UsernamePasswordAuthenticationFilter.class);
     }
 
 
@@ -101,5 +117,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
     }
 
+    @Bean
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
+    }
 
 }
